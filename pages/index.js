@@ -1,30 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+import React from 'react';
+
+import { useQuery } from 'react-query';
+
 
 export default function Home() {
-  const [fact, setFact] = useState(null);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch('/api/hello')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setFact(data.fact);
-      })
-      .catch(error => {
-        setError(error.message);
-      });
-  }, []);
 
+  const { isLoading, error, data } = useQuery('repoData', () =>
+    fetch('/api/hello').then(res =>
+      res.json()
+    )
+  )
+
+
+  if (isLoading) return 'Loading...'
+  if (error) return 'An error has occurred: ' + error.message
   return (
     <div>
       <h1>Hello from numbers</h1>
-      {fact && <p>{fact}</p>}
+      {data.fact && <p>{data.fact}</p>}
       {error && <p>Error: {error}</p>}
     </div>
   );
